@@ -16,6 +16,8 @@
 		955AD20629421EEC00512C2B /* Vic_MortyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 955AD20529421EEC00512C2B /* Vic_MortyUITests.swift */; };
 		955AD20829421EEC00512C2B /* Vic_MortyUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 955AD20729421EEC00512C2B /* Vic_MortyUITestsLaunchTests.swift */; };
 		955AD2152942201000512C2B /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 955AD2142942201000512C2B /* MainViewController.swift */; };
+		955AD21B2942276300512C2B /* CharacterResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 955AD21A2942276300512C2B /* CharacterResult.swift */; };
+		955AD21D29422B0F00512C2B /* MainPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 955AD21C29422B0F00512C2B /* MainPresenter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,8 @@
 		955AD20529421EEC00512C2B /* Vic_MortyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vic_MortyUITests.swift; sourceTree = "<group>"; };
 		955AD20729421EEC00512C2B /* Vic_MortyUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vic_MortyUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		955AD2142942201000512C2B /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		955AD21A2942276300512C2B /* CharacterResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterResult.swift; sourceTree = "<group>"; };
+		955AD21C29422B0F00512C2B /* MainPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPresenter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,13 +103,16 @@
 		955AD1E329421EE800512C2B /* Vic&Morty */ = {
 			isa = PBXGroup;
 			children = (
-				955AD2162942223200512C2B /* Presentation */,
 				955AD1E429421EE800512C2B /* AppDelegate.swift */,
 				955AD1E629421EE800512C2B /* SceneDelegate.swift */,
-				955AD1EA29421EE800512C2B /* Main.storyboard */,
 				955AD1ED29421EEC00512C2B /* Assets.xcassets */,
-				955AD1EF29421EEC00512C2B /* LaunchScreen.storyboard */,
+				955AD2192942272E00512C2B /* Model */,
+				955AD2162942223200512C2B /* Presentation */,
+				955AD2172942272000512C2B /* Service */,
+				955AD2182942272700512C2B /* Helpers */,
 				955AD1F229421EEC00512C2B /* Info.plist */,
+				955AD1EF29421EEC00512C2B /* LaunchScreen.storyboard */,
+				955AD1EA29421EE800512C2B /* Main.storyboard */,
 			);
 			path = "Vic&Morty";
 			sourceTree = "<group>";
@@ -131,8 +138,31 @@
 			isa = PBXGroup;
 			children = (
 				955AD2142942201000512C2B /* MainViewController.swift */,
+				955AD21C29422B0F00512C2B /* MainPresenter.swift */,
 			);
 			path = Presentation;
+			sourceTree = "<group>";
+		};
+		955AD2172942272000512C2B /* Service */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		955AD2182942272700512C2B /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		955AD2192942272E00512C2B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				955AD21A2942276300512C2B /* CharacterResult.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -266,6 +296,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				955AD21D29422B0F00512C2B /* MainPresenter.swift in Sources */,
+				955AD21B2942276300512C2B /* CharacterResult.swift in Sources */,
 				955AD1E529421EE800512C2B /* AppDelegate.swift in Sources */,
 				955AD1E729421EE800512C2B /* SceneDelegate.swift in Sources */,
 				955AD2152942201000512C2B /* MainViewController.swift in Sources */,
