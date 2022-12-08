@@ -9,7 +9,7 @@ import UIKit
 
 protocol MainViewProtocol: AnyObject {
 	func onSuccess()
-	func onError()
+	func onError(with page: Int)
 	func onMaxPagesLoaded()
 }
 
@@ -32,26 +32,55 @@ class MainViewController: UITableViewController {
 		self.navigationController?.navigationBar.prefersLargeTitles = true
 		self.navigationController?.navigationBar.barTintColor = .systemBackground
 		self.title = "Vic & Morty"
+		
+		self.registerCell()
+		self.initialDownload()
+	}
+	
+	private func registerCell() {
+		tableView.register(CharacterCell.self, forCellReuseIdentifier: CharacterCell.identifier)
+	}
+	
+	private func initialDownload() {
+		self.startRequest(with: 0)
+	}
+	
+	private func startRequest(with page: Int) {
+		self.presenter.getCharacters(page: page)
 	}
 }
 
 extension MainViewController: MainViewProtocol {
 	func onSuccess() {
-		// TODO: - updateViews after characters are fetched
+		DispatchQueue.main.async {
+			self.tableView.reloadData()
+			self.cleanSpinners()
+		}
 	}
 	
-	func onError() {
-		// TODO: - Handle error
+	func onError(with page: Int) {
+		// TODO: - handle error
 	}
 	
 	func onMaxPagesLoaded() {
-		// TODO: - handle when max pages is reached
+		self.cleanSpinners()
+		let alertController = UIAlertController.init(title: "There are no more results", message: nil, preferredStyle: .alert)
+		let actionCancel = UIAlertAction.init(title: "Ok", style: .cancel)
+		alertController.addAction(actionCancel)
+		
+		self.present(alertController, animated: true)
+	}
+	
+	private func cleanSpinners() {
+		self.refreshControl?.endRefreshing()
+		self.tableView.tableFooterView = nil
+		self.tableView.tableHeaderView = nil
 	}
 }
 
 extension MainViewController {
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return 20
+		return presenter.characters.count
 	}
 	
 	override func numberOfSections(in tableView: UITableView) -> Int {
@@ -65,11 +94,42 @@ extension MainViewController {
 	}
 	
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = UITableViewCell()
+		guard let cell = tableView.dequeueReusableCell(withIdentifier: CharacterCell.identifier, for: indexPath) as? CharacterCell else { return UITableViewCell() }
+		let character = self.presenter.characters[indexPath.row]
+		cell.character = character
 		
-		
-		
+		if let data = self.presenter.getCachedImage(url: character.image) {
+			cell.setImage(UIImage.from(data: data))
+		} else {
+			cell.setImage(nil)
+			let id = self.presenter.getImage(
+				from: character.image,
+				onSuccess: { data in
+					let img = UIImage.from(data: data)
+					// This is to avoid loading images that don't belong to the cell, when it finished downloading.
+					if cell.character?.image == character.image {
+						DispatchQueue.main.async {
+							cell.setImage(img)
+						}
+					}
+				}, onError: { error in
+					DispatchQueue.main.async {
+						cell.setImage(UIImage(systemName: "picture"))
+					}
+				}
+			)
+			
+			// The download operation is stopped in case of cell reuse
+			cell.onReuse = {
+				if let id = id {
+					self.presenter.cancelLoad(id: id)
+				}
+			}
+		}
 		return cell
 	}
+	
+	
+	// TODO: - didSelectRow
 }
 
