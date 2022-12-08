@@ -95,13 +95,11 @@ class CharacterCell: UITableViewCell {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
 		
 		self.contentView.clipsToBounds = true
-		self.contentView.backgroundColor = .systemGray6
-		
+		self.contentView.backgroundColor = .white
 		self.contentView.addSubview(characterImage)
 		self.contentView.addSubview(nameLabel)
 		self.contentView.addSubview(descriptionLabel)
 		self.contentView.addSubview(genre)
-		
 		self.setupLayout()
 	}
 	
@@ -147,20 +145,22 @@ class CharacterCell: UITableViewCell {
 	}
 	
 	private func setNameLabelConstraints() {
+		self.nameLabel.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 12).isActive = true
 		self.nameLabel.leadingAnchor.constraint(equalTo: self.characterImage.trailingAnchor, constant: 10).isActive = true
-		self.nameLabel.centerYAnchor.constraint(equalTo: self.characterImage.centerYAnchor, constant: -10).isActive = true
-		self.nameLabel.trailingAnchor.constraint(equalTo: self.genre.leadingAnchor, constant: -4).isActive = true
+		self.nameLabel.trailingAnchor.constraint(equalTo: self.genre.leadingAnchor, constant: 4).isActive = true
+
+		self.nameLabel.numberOfLines = 2
 	}
 	
 	private func setupDescriptionConstraints() {
+		self.descriptionLabel.topAnchor.constraint(equalTo: self.nameLabel.bottomAnchor, constant: 5).isActive = true
 		self.descriptionLabel.leadingAnchor.constraint(equalTo: self.nameLabel.leadingAnchor).isActive = true
-		self.descriptionLabel.centerYAnchor.constraint(equalTo: self.characterImage.centerYAnchor, constant: 10).isActive = true
 		self.descriptionLabel.trailingAnchor.constraint(equalTo: self.genre.leadingAnchor, constant: -4).isActive = true
 	}
 	
 	private func setupGenreConstraints() {
-		self.genre.widthAnchor.constraint(equalToConstant: 66).isActive = true
-		self.genre.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -20).isActive = true
+		self.genre.widthAnchor.constraint(equalToConstant: 65).isActive = true
+		self.genre.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor, constant: -16).isActive = true
 		self.genre.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 12).isActive = true
 	}
 	

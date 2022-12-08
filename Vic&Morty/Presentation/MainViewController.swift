@@ -59,7 +59,21 @@ extension MainViewController: MainViewProtocol {
 	}
 	
 	func onError(with page: Int) {
-		// TODO: - handle error
+		let alertController = UIAlertController.init(title: "There was an error with the API call", message: "Do you want to retry?", preferredStyle: .alert)
+		
+		let action = UIAlertAction.init(title: "Yes", style: .default, handler: { _ in
+			self.startRequest(with: page)
+		})
+		
+		let actionCancel = UIAlertAction.init(title: "No", style: .cancel)
+		
+		alertController.addAction(actionCancel)
+		alertController.addAction(action)
+		
+		DispatchQueue.main.async {
+			self.present(alertController, animated: true)
+			self.cleanSpinners()
+		}
 	}
 	
 	func onMaxPagesLoaded() {
@@ -78,6 +92,7 @@ extension MainViewController: MainViewProtocol {
 	}
 }
 
+// MARK: - tableView DataSource & Delegate methods
 extension MainViewController {
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return presenter.characters.count
@@ -132,4 +147,45 @@ extension MainViewController {
 	
 	// TODO: - didSelectRow
 }
+
+// MARK: - scrollViewDidScroll
+extension MainViewController {
+	private func createSpinnerFooter() -> UIView {
+		let footerView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: 50))
+		
+		footerView.backgroundColor = .clear
+		
+		let spinner = UIActivityIndicatorView()
+		spinner.center = footerView.center
+		
+		footerView.addSubview(spinner)
+		spinner.startAnimating()
+		
+		return footerView
+	}
+	
+	override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+		let position = scrollView.contentOffset.y
+		let tableViewHeight = self.tableView.contentSize.height
+		let scrollHeight = scrollView.frame.size.height
+		
+		if position > (tableViewHeight - scrollHeight) {
+			let downloadedCount = self.presenter.characters.count
+			
+			guard self.presenter.canDownload(), downloadedCount != 0 else {
+				return
+			}
+			
+			DispatchQueue.main.async {
+				self.tableView.tableFooterView = self.createSpinnerFooter()
+			}
+			
+			// Here I add 1 page because of the initial data that is gathered on viewDidLoad
+			let page = Int(downloadedCount/20) + 1
+			
+			self.startRequest(with: page)
+		}
+	}
+}
+
 
