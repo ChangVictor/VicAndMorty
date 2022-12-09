@@ -14,12 +14,12 @@ protocol DetailProtocol: AnyObject {
 
 class DetailViewController: UIViewController {
 	
+	// MARK: - View Properties
 	private let characterImage: UIImageView = {
 		let img = UIImageView()
 		img.contentMode = .scaleAspectFill
 		img.translatesAutoresizingMaskIntoConstraints = false
-		img.layer.cornerRadius = 0
-		img.clipsToBounds = true
+		img.layer.cornerRadius = 10
 		return img
 	}()
 	
@@ -116,6 +116,13 @@ class DetailViewController: UIViewController {
 		return label
 	}()
 	
+	let cardView: UIView = {
+		let view = UIView()
+		view.translatesAutoresizingMaskIntoConstraints = false
+		return view
+	}()
+	
+	// MARK: - LifeCycle methods
 	init() {
 		super.init(nibName: nil, bundle: nil)
 	}
@@ -126,9 +133,14 @@ class DetailViewController: UIViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
+		let blurEffect = UIBlurEffect(style: .systemUltraThinMaterial)
+		let blurEffectView = UIVisualEffectView(effect: blurEffect)
+		blurEffectView.frame = self.view.frame
+		self.view.insertSubview(blurEffectView, at: 0)
+		self.view.backgroundColor = .clear
 		
-		self.view.backgroundColor = .systemGray6
 		self.setupClose()
+		self.setupCardView()
 		self.setupImage()
 		self.setupName()
 		self.setupSpecies()
@@ -136,6 +148,7 @@ class DetailViewController: UIViewController {
 		self.setupStatus()
 	}
 	
+	// MARK: - View setup & constraints
 	private func setupClose() {
 		self.view.addSubview(self.closeButton)
 		self.closeButton.addTarget(self, action: #selector(closeTapped), for: .touchUpInside)
@@ -149,31 +162,49 @@ class DetailViewController: UIViewController {
 	}
 	
 	private func setupImage() {
-		self.view.addSubview(self.characterImage)
-		
-		self.characterImage.topAnchor.constraint(equalTo: self.closeButton.bottomAnchor, constant: 16).isActive = true
-		self.characterImage.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+		self.cardView.addSubview(self.characterImage)
+		self.characterImage.topAnchor.constraint(equalTo: self.cardView.topAnchor, constant: -120).isActive = true
+		self.characterImage.centerXAnchor.constraint(equalTo: self.cardView.centerXAnchor).isActive = true
 		self.characterImage.widthAnchor.constraint(equalToConstant: 240).isActive = true
 		self.characterImage.heightAnchor.constraint(equalToConstant: 240).isActive = true
+		self.characterImage.layer.borderWidth = 1.5
+		self.characterImage.layer.masksToBounds = false
+		self.characterImage.layer.borderColor = UIColor.gray.cgColor
+		self.characterImage.layer.cornerRadius = 10
+		self.characterImage.clipsToBounds = true
+
+	}
+	
+	private func setupCardView() {
+		self.view.addSubview(self.cardView)
+		self.cardView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0).isActive = true
+		self.cardView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0).isActive = true
+		self.cardView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: self.view.frame.height / 4).isActive = true
+		self.cardView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: 0).isActive = true
+
+		self.cardView.layer.cornerRadius = 15
+		self.cardView.backgroundColor = .systemBackground
+
+		self.cardView.layer.shadowColor = UIColor.black.cgColor
+		self.cardView.layer.shadowOpacity = 0.3
+		self.cardView.layer.shadowOffset = CGSize(width: 0, height: 0)
+		self.cardView.layer.shadowRadius = 3
 	}
 	
 	private func setupName() {
-		self.view.addSubview(self.nameTitle)
-		self.view.addSubview(self.nameLabel)
-		
+		self.cardView.addSubview(self.nameTitle)
+		self.cardView.addSubview(self.nameLabel)
 		self.nameTitle.topAnchor.constraint(equalTo: self.characterImage.bottomAnchor, constant: 40).isActive = true
 		self.nameTitle.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 24).isActive = true
 		self.nameTitle.widthAnchor.constraint(equalToConstant: 80).isActive = true
-		
 		self.nameLabel.topAnchor.constraint(equalTo: self.nameTitle.topAnchor).isActive = true
 		self.nameLabel.leadingAnchor.constraint(equalTo: self.nameTitle.trailingAnchor, constant: 24).isActive = true
 		self.nameLabel.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
 	}
 	
 	private func setupSpecies() {
-		self.view.addSubview(self.speciesLabel)
-		self.view.addSubview(self.speciesTitle)
-		
+		self.cardView.addSubview(self.speciesLabel)
+		self.cardView.addSubview(self.speciesTitle)
 		self.speciesTitle.topAnchor.constraint(equalTo: self.nameTitle.bottomAnchor, constant: 28).isActive = true
 		self.speciesTitle.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 24).isActive = true
 		self.speciesTitle.widthAnchor.constraint(equalToConstant: 80).isActive = true
@@ -184,9 +215,8 @@ class DetailViewController: UIViewController {
 	}
 	
 	private func setupGender() {
-		self.view.addSubview(self.genderTitle)
-		self.view.addSubview(self.genderLabel)
-		
+		self.cardView.addSubview(self.genderTitle)
+		self.cardView.addSubview(self.genderLabel)
 		self.genderTitle.topAnchor.constraint(equalTo: self.speciesTitle.bottomAnchor, constant: 28).isActive = true
 		self.genderTitle.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 24).isActive = true
 		self.genderTitle.widthAnchor.constraint(equalToConstant: 80).isActive = true
@@ -197,9 +227,8 @@ class DetailViewController: UIViewController {
 	}
 	
 	private func setupStatus() {
-		self.view.addSubview(self.statusTitle)
-		self.view.addSubview(self.statusLabel)
-		
+		self.cardView.addSubview(self.statusTitle)
+		self.cardView.addSubview(self.statusLabel)
 		self.statusTitle.topAnchor.constraint(equalTo: self.genderTitle.bottomAnchor, constant: 28).isActive = true
 		self.statusTitle.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 24).isActive = true
 		self.statusTitle.widthAnchor.constraint(equalToConstant: 80).isActive = true

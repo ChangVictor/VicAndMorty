@@ -46,19 +46,16 @@ class CharacterCell: UITableViewCell {
 		label.translatesAutoresizingMaskIntoConstraints = false
 		label.numberOfLines = 1
 		label.lineBreakMode = .byTruncatingTail
-		
 		return label
 	}()
 	
 	private let descriptionLabel: UILabel = {
 		let label = UILabel()
-		
 		label.font = UIFont.boldSystemFont(ofSize: 14)
 		label.textColor = .secondaryLabel
 		label.translatesAutoresizingMaskIntoConstraints = false
 		label.numberOfLines = 0
 		label.lineBreakMode = .byWordWrapping
-		
 		return label
 	}()
 	
@@ -78,7 +75,6 @@ class CharacterCell: UITableViewCell {
 		button.configuration = config
 		button.tintColor = .label
 		button.isUserInteractionEnabled = false
-		
 		return button
 	}()
 	
@@ -86,7 +82,6 @@ class CharacterCell: UITableViewCell {
 		let activityIndicator = UIActivityIndicatorView()
 		activityIndicator.hidesWhenStopped = true
 		activityIndicator.color = UIColor.black
-		
 		return activityIndicator
 	}()
 	
@@ -96,16 +91,13 @@ class CharacterCell: UITableViewCell {
 		return view
 	}()
 	
+	// MARK: - Lifecycle methods
+	
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
 		
 		self.contentView.clipsToBounds = true
 		self.contentView.backgroundColor = .white
-//		self.contentView.addSubview(cardView)
-//		self.contentView.addSubview(characterImage)
-//		self.contentView.addSubview(nameLabel)
-//		self.contentView.addSubview(descriptionLabel)
-//		self.contentView.addSubview(genre)
 		self.contentView.addSubview(cardView)
 		self.cardView.addSubview(characterImage)
 		self.cardView.addSubview(nameLabel)
@@ -125,12 +117,12 @@ class CharacterCell: UITableViewCell {
 	
 	override func layoutSubviews() {
 		super.layoutSubviews()
-		
 		self.preservesSuperviewLayoutMargins = false
 		self.separatorInset = UIEdgeInsets.zero
 		self.layoutMargins = UIEdgeInsets.zero
 	}
 	
+	// MARK: - Setup
 	private func setupLayout() {
 		self.setImageConstraints()
 		self.setNameLabelConstraints()
@@ -141,23 +133,22 @@ class CharacterCell: UITableViewCell {
 	}
 	
 	private func setupCardViewConstraints() {
-		cardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
-		cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
-		cardView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
-		cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
-		cardView.layer.cornerRadius = 10
-		cardView.backgroundColor = .white
-		cardView.layer.shadowColor = UIColor.black.cgColor
-		cardView.layer.shadowOpacity = 0.3
-		cardView.layer.shadowOffset = CGSize(width: -2, height: 3)
-		cardView.layer.shadowRadius = 3
+		self.cardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+		self.cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
+		self.cardView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
+		self.cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
+		self.cardView.layer.cornerRadius = 10
+		self.cardView.backgroundColor = .white
+		self.cardView.layer.shadowColor = UIColor.black.cgColor
+		self.cardView.layer.shadowOpacity = 0.3
+		self.cardView.layer.shadowOffset = CGSize(width: -2, height: 3)
+		self.cardView.layer.shadowRadius = 3
 		
 	}
 	
 	private func setupImageLoaderIndicator() {
 		self.characterImage.addSubview(activityIndicator)
 		self.activityIndicator.bringSubviewToFront(characterImage)
-		
 		self.activityIndicator.translatesAutoresizingMaskIntoConstraints = false
 		self.activityIndicator.centerXAnchor.constraint(equalTo: self.characterImage.centerXAnchor).isActive = true
 		self.activityIndicator.centerYAnchor.constraint(equalTo: self.characterImage.centerYAnchor).isActive = true
@@ -174,7 +165,6 @@ class CharacterCell: UITableViewCell {
 		self.nameLabel.topAnchor.constraint(equalTo: self.cardView.topAnchor, constant: 15).isActive = true
 		self.nameLabel.leadingAnchor.constraint(equalTo: self.characterImage.trailingAnchor, constant: 10).isActive = true
 		self.nameLabel.trailingAnchor.constraint(equalTo: self.genre.leadingAnchor, constant: -5).isActive = true
-
 		self.nameLabel.numberOfLines = 2
 	}
 	
@@ -186,7 +176,6 @@ class CharacterCell: UITableViewCell {
 	
 	private func setupGenreConstraints() {
 		self.genre.widthAnchor.constraint(equalToConstant: 65).isActive = true
-//		self.genre.leadingAnchor.constraint(equalTo: self.nameLabel.trailingAnchor, constant: 15).isActive = true
 		self.genre.trailingAnchor.constraint(equalTo: self.cardView.trailingAnchor, constant: -15).isActive = true
 		self.genre.topAnchor.constraint(equalTo: self.cardView.topAnchor, constant: 15).isActive = true
 	}
@@ -198,7 +187,6 @@ class CharacterCell: UITableViewCell {
 			} else {
 				self.activityIndicator.stopAnimating()
 			}
-			
 			self.characterImage.image = image
 		}
 	}

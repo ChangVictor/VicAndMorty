@@ -135,7 +135,6 @@ extension MainViewController {
 					}
 				}
 			)
-			
 			// The download operation is stopped in case of cell reuse
 			cell.onReuse = {
 				if let id = id {
@@ -151,6 +150,7 @@ extension MainViewController {
 		let character = self.presenter.characters[indexPath.row]
 		
 		self.present(controller, animated: true)
+		controller.modalPresentationStyle = .overCurrentContext
 		controller.configure(with: character)
 		
 		_ = self.presenter.getImage(
