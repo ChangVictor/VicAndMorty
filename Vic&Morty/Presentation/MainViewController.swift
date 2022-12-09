@@ -30,7 +30,9 @@ class MainViewController: UITableViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		self.navigationController?.navigationBar.prefersLargeTitles = true
-		self.navigationController?.navigationBar.barTintColor = .systemBackground
+		self.navigationController?.navigationBar.backgroundColor = .systemBackground
+		self.view.backgroundColor = .white
+		self.tableView.separatorStyle = .none
 		self.title = "Vic & Morty"
 		
 		self.registerCell()
@@ -105,7 +107,7 @@ extension MainViewController {
 
 extension MainViewController {
 	override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-		return 80
+		return 120
 	}
 	
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -143,7 +145,6 @@ extension MainViewController {
 		}
 		return cell
 	}
-	
 	
 	// TODO: - didSelectRow
 }
