@@ -146,7 +146,25 @@ extension MainViewController {
 		return cell
 	}
 	
-	// TODO: - didSelectRow
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		let controller = DetailViewController()
+		let character = self.presenter.characters[indexPath.row]
+		
+		self.present(controller, animated: true)
+		controller.configure(with: character)
+		
+		_ = self.presenter.getImage(
+			from: character.image,
+			onSuccess: { data in
+				
+				let img = UIImage.from(data: data)
+				
+				controller.setImage(img)
+			}, onError: { error in
+				controller.setImage(UIImage(systemName: "picture"))
+			}
+		)
+	}
 }
 
 // MARK: - scrollViewDidScroll
