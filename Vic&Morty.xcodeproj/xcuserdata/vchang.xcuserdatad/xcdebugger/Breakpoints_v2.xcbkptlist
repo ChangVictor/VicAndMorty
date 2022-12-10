@@ -128,8 +128,8 @@
             filePath = "Vic&amp;Morty/Service/Networking/RickAndMortyApiClient.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "118"
-            endingLineNumber = "118"
+            startingLineNumber = "88"
+            endingLineNumber = "88"
             landmarkName = "searchCharacters(character:page:onSuccess:onError:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -144,8 +144,8 @@
             filePath = "Vic&amp;Morty/Service/Networking/RickAndMortyApiClient.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "118"
-            endingLineNumber = "118"
+            startingLineNumber = "88"
+            endingLineNumber = "88"
             landmarkName = "searchCharacters(character:page:onSuccess:onError:)"
             landmarkType = "7">
          </BreakpointContent>

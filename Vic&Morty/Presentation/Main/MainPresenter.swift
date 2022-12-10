@@ -13,16 +13,9 @@ protocol MainPresenterProtocol: AnyObject {
 	var searchedCharacters: [Character] { get }
 	
 	func cleanSearchedCharacters()
-	func getCachedImage(url: String) -> Data?
 	func canDownload() -> Bool
 	func getCharacters(page: Int)
 	func searchCharacters(character: String, page: Int)
-	func getImage(
-		from url: String,
-		onSuccess: @escaping (Data) -> (Void),
-		onError: @escaping (Error) -> (Void)
-	) -> UUID?
-	func cancelLoad(id: UUID)
 }
 
 class MainPresenter: MainPresenterProtocol {
@@ -90,35 +83,11 @@ class MainPresenter: MainPresenterProtocol {
 		}
 	}
 
-	
-	func getImage(
-		from url: String,
-		onSuccess: @escaping (Data) -> (Void),
-		onError: @escaping (Error) -> (Void)
-	) -> UUID? {
-		return self.restClient.getImage(
-			from: url,
-			onSuccess: { data in
-				onSuccess(data)
-			}, onError: { error in
-				onError(error)
-			}
-		)
-	}
-	
-	func getCachedImage(url: String) -> Data? {
-		return self.restClient.getCachedImage(url: url)
-	}
-	
-	func cancelLoad(id: UUID) {
-		self.restClient.cancelLoad(id: id)
-	}
-	
 	func canDownload() -> Bool {
 		return !self.isDownloading
 	}
 	
 	func cleanSearchedCharacters() {
-		self.searchedCharacters = []
+		self.searchedCharacters.removeAll()
 	}
 }

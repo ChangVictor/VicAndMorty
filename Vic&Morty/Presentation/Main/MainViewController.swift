@@ -32,21 +32,15 @@ class MainViewController: UITableViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
-		searchController.searchResultsUpdater = self
-		searchController.obscuresBackgroundDuringPresentation = false
-		searchController.searchBar.placeholder = Constants.Strings.searchBarPlaceholder
-		navigationItem.searchController = searchController
-		definesPresentationContext = true
-		
-		self.navigationController?.navigationBar.prefersLargeTitles = true
-		self.navigationController?.navigationBar.backgroundColor = .systemBackground
-		self.view.backgroundColor = .white
 		self.tableView.separatorStyle = .none
-		self.title = Constants.Strings.navigationTitle
+		self.view.backgroundColor = .white
 		
+		self.setupNavigationBar()
 		self.registerCell()
+		self.setupSearchBar()
 		self.initialDownload()
+		self.setupToolbar()
+		self.setupNavigationItem()
 	}
 	
 	private func registerCell() {
@@ -62,8 +56,47 @@ class MainViewController: UITableViewController {
 			self.presenter.getCharacters(page: page)
 		}
 	}
+	
+	private func setupSearchBar() {
+		searchController.searchResultsUpdater = self
+		searchController.obscuresBackgroundDuringPresentation = false
+		searchController.searchBar.placeholder = Constants.Strings.searchBarPlaceholder
+		navigationItem.searchController = searchController
+		definesPresentationContext = true
+	}
+	
+	private func setupNavigationBar() {
+		self.navigationController?.navigationBar.prefersLargeTitles = true
+		self.navigationController?.navigationBar.backgroundColor = .systemBackground
+		self.title = Constants.Strings.navigationTitle
+	}
+	
+	private func setupToolbar() {
+		let toolbar = UIToolbar(frame: CGRect(origin: .zero, size: .init(width: view.frame.size.width, height: 40)))
+		let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+		let doneButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(dismisKeyboard))
+		toolbar.setItems([flexSpace, doneButton], animated: true)
+		toolbar.sizeToFit()
+		self.searchController.searchBar.searchTextField.inputAccessoryView = toolbar
+	}
+	
+	@objc fileprivate func dismisKeyboard() {
+		searchController.searchBar.searchTextField.resignFirstResponder()
+		self.tableView?.scrollToRow(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+	}
+	
+	private func setupNavigationItem() {
+		let rightNavBarButton = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(handleSearchButtonTapped))
+		self.navigationItem.rightBarButtonItem = rightNavBarButton
+	}
+	
+	@objc func handleSearchButtonTapped() {
+		self.tableView?.scrollToRow(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+		searchController.searchBar.becomeFirstResponder()
+	}
 }
 
+// MARK: - Protocol methods
 extension MainViewController: MainViewProtocol {
 	func onSuccess() {
 		DispatchQueue.main.async {
@@ -131,11 +164,9 @@ extension MainViewController {
 		if !self.presenter.searchedCharacters.isEmpty {
 			let character = self.presenter.searchedCharacters[indexPath.row]
 			cell.character = character
-			self.cacheImage(for: cell, character: character)
 		} else {
 			let character = self.presenter.characters[indexPath.row]
 			cell.character = character
-			self.cacheImage(for: cell, character: character)
 		}
 		return cell
 	}
@@ -149,50 +180,6 @@ extension MainViewController {
 		controller.configure(with: character)
 		self.present(controller, animated: true)
 		controller.modalPresentationStyle = .overCurrentContext
-		
-		_ = self.presenter.getImage(
-			from: character.image,
-			onSuccess: { data in
-				let img = UIImage.from(data: data)
-				controller.setImage(img)
-			}, onError: { error in
-				controller.setImage(UIImage(systemName: "picture"))
-			}
-		)
-	}
-}
-
-extension MainViewController {
-	
-	private func cacheImage(for cell: CharacterCell, character: Character) {
-		if let data = self.presenter.getCachedImage(url: character.image) {
-			cell.setImage(UIImage.from(data: data))
-		} else {
-			cell.setImage(nil)
-			let id = self.presenter.getImage(
-				from: character.image,
-				onSuccess: { data in
-					let img = UIImage.from(data: data)
-					// This is to avoid loading images that don't belong to the cell, when it finished downloading.
-					if cell.character?.image == character.image {
-						DispatchQueue.main.async {
-							cell.setImage(img)
-						}
-					}
-				}, onError: { error in
-					DispatchQueue.main.async {
-						cell.setImage(UIImage(systemName: "picture"))
-					}
-				}
-			)
-			// The download operation is stopped in case of cell reuse
-			cell.onReuse = {
-				if let id = id {
-					self.presenter.cancelLoad(id: id)
-				}
-			}
-		}
-
 	}
 }
 
@@ -215,6 +202,8 @@ extension MainViewController {
 		let position = scrollView.contentOffset.y
 		let tableViewHeight = self.tableView.contentSize.height
 		let scrollHeight = scrollView.frame.size.height
+		scrollView.keyboardDismissMode = .onDrag
+		self.searchController.searchBar.resignFirstResponder()
 		
 		if position > (tableViewHeight - scrollHeight) {
 			let downloadedCount = self.presenter.characters.count
@@ -231,15 +220,15 @@ extension MainViewController {
 	}
 }
 
+// MARK: - Searchbar delegates
 extension MainViewController: UISearchResultsUpdating {
 	func updateSearchResults(for searchController: UISearchController) {
 		
 		guard let searchText = searchController.searchBar.text else { return }
-		
+
 		if !searchText.isEmpty {
-			// get searched characters
 			timer?.invalidate()
-			timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { [weak self] _ in
+			timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { [weak self] _ in
 				DispatchQueue.global(qos: .background).async {
 					self?.presenter.searchCharacters(character: searchText, page: 0)
 				}
@@ -254,7 +243,6 @@ extension MainViewController: UISearchResultsUpdating {
 }
 
 extension MainViewController: UISearchBarDelegate {
-	
 	func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
 		self.tableView?.scrollToRow(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
 	}

@@ -9,14 +9,13 @@ import UIKit
 
 protocol DetailProtocol: AnyObject {
 	func configure(with character: Character)
-	func setImage(_ image: UIImage?)
 }
 
 class DetailViewController: UIViewController {
 	
 	// MARK: - View Properties
-	private let characterImage: UIImageView = {
-		let img = UIImageView()
+	private let characterImage: CustomImageView = {
+		let img = CustomImageView()
 		img.contentMode = .scaleAspectFill
 		img.translatesAutoresizingMaskIntoConstraints = false
 		img.layer.cornerRadius = 10
@@ -239,6 +238,7 @@ class DetailViewController: UIViewController {
 	}
 }
 
+// MARK: - Protocol method
 extension DetailViewController: DetailProtocol {
 	
 	func configure(with character: Character) {
@@ -246,9 +246,6 @@ extension DetailViewController: DetailProtocol {
 		self.speciesLabel.text = character.species.capitalized
 		self.genderLabel.text = character.gender.capitalized
 		self.statusLabel.text = character.status.capitalized
-	}
-	
-	func setImage(_ image: UIImage?) {
-		self.characterImage.image = image
+		self.characterImage.loadImage(fromUrl: character.image)
 	}
 }

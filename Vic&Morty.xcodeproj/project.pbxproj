@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		95279D82294534C900F510B2 /* Constants+Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95279D81294534C900F510B2 /* Constants+Strings.swift */; };
+		95279D842945399600F510B2 /* CustomImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95279D832945399600F510B2 /* CustomImageView.swift */; };
 		955AD1E529421EE800512C2B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 955AD1E429421EE800512C2B /* AppDelegate.swift */; };
 		955AD1E729421EE800512C2B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 955AD1E629421EE800512C2B /* SceneDelegate.swift */; };
 		955AD1EC29421EE800512C2B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 955AD1EA29421EE800512C2B /* Main.storyboard */; };
@@ -46,6 +47,7 @@
 
 /* Begin PBXFileReference section */
 		95279D81294534C900F510B2 /* Constants+Strings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Constants+Strings.swift"; sourceTree = "<group>"; };
+		95279D832945399600F510B2 /* CustomImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomImageView.swift; sourceTree = "<group>"; };
 		955AD1E129421EE800512C2B /* Vic&Morty.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vic&Morty.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		955AD1E429421EE800512C2B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		955AD1E629421EE800512C2B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -171,6 +173,7 @@
 			children = (
 				955AD224294238F600512C2B /* Constants+Networking.swift */,
 				95279D81294534C900F510B2 /* Constants+Strings.swift */,
+				95279D832945399600F510B2 /* CustomImageView.swift */,
 				955AD223294238DA00512C2B /* Extensions */,
 			);
 			path = Helpers;
@@ -369,6 +372,7 @@
 				955AD22A2942414600512C2B /* UIImage+Extension.swift in Sources */,
 				955AD1E729421EE800512C2B /* SceneDelegate.swift in Sources */,
 				955AD2152942201000512C2B /* MainViewController.swift in Sources */,
+				95279D842945399600F510B2 /* CustomImageView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
