@@ -18,6 +18,13 @@ protocol RickAndMortyApiClientProtocol {
 		onError: @escaping (Error) -> (Void)
 	)
 	
+	func searchCharacters(
+		character: String,
+		page: Int,
+		onSuccess: @escaping (CharacterResult) -> (Void),
+		onError: @escaping (Error) -> (Void)
+	)
+	
 	func getImage(
 		from url: String,
 		onSuccess: @escaping (Data) -> (Void),
@@ -89,6 +96,26 @@ class RickAndMortyApiClient: RickAndMortyApiClientProtocol {
 			},
 			onError: { error in
 				onError(error)
+			}
+		)
+	}
+	
+	func searchCharacters(
+		character: String,
+		page: Int,
+		onSuccess: @escaping (CharacterResult) -> (Void),
+		onError: @escaping (Error) -> (Void)
+	) {
+		self.baseRestClient.performRequest(
+			with: components(with: Constants.Networking.characterPath),
+			queryParams: [Constants.Networking.pageQueryParam: String(page),
+						  Constants.Networking.nameQueryParam: String(character)],
+			onSuccess: { (deliveryItems: CharacterResult) in
+				onSuccess(deliveryItems)
+			},
+			onError: { error in
+				onError(error)
+				print(error.localizedDescription)
 			}
 		)
 	}

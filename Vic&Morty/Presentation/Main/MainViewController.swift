@@ -17,6 +17,10 @@ class MainViewController: UITableViewController {
 	
 	private var presenter: MainPresenterProtocol
 	
+	let searchController = UISearchController(searchResultsController: nil)
+	private var searchResultViewController: SearchResultViewController!
+	private var timer: Timer?
+
 	init(_ presenter: MainPresenterProtocol = MainPresenter()) {
 		self.presenter = presenter
 		super.init(nibName: nil, bundle: nil)
@@ -29,6 +33,13 @@ class MainViewController: UITableViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
+		
+		searchController.searchResultsUpdater = self
+		searchController.obscuresBackgroundDuringPresentation = false
+		searchController.searchBar.placeholder = "Search Characters..."
+		navigationItem.searchController = searchController
+		definesPresentationContext = true
+		
 		self.navigationController?.navigationBar.prefersLargeTitles = true
 		self.navigationController?.navigationBar.backgroundColor = .systemBackground
 		self.view.backgroundColor = .white
@@ -48,7 +59,9 @@ class MainViewController: UITableViewController {
 	}
 	
 	private func startRequest(with page: Int) {
-		self.presenter.getCharacters(page: page)
+		DispatchQueue.global(qos: .background).async {
+			self.presenter.getCharacters(page: page)
+		}
 	}
 }
 
@@ -83,21 +96,28 @@ extension MainViewController: MainViewProtocol {
 		let alertController = UIAlertController.init(title: "There are no more results", message: nil, preferredStyle: .alert)
 		let actionCancel = UIAlertAction.init(title: "Ok", style: .cancel)
 		alertController.addAction(actionCancel)
-		
-		self.present(alertController, animated: true)
+		DispatchQueue.main.async {
+			self.present(alertController, animated: true)
+		}
 	}
 	
 	private func cleanSpinners() {
-		self.refreshControl?.endRefreshing()
-		self.tableView.tableFooterView = nil
-		self.tableView.tableHeaderView = nil
+		DispatchQueue.main.async {
+			self.refreshControl?.endRefreshing()
+			self.tableView.tableFooterView = nil
+			self.tableView.tableHeaderView = nil
+		}
 	}
 }
 
 // MARK: - tableView DataSource & Delegate methods
 extension MainViewController {
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return presenter.characters.count
+		if self.presenter.searchedCharacters.isEmpty {
+			return presenter.characters.count
+		} else {
+			return presenter.searchedCharacters.count
+		}
 	}
 	
 	override func numberOfSections(in tableView: UITableView) -> Int {
@@ -112,9 +132,44 @@ extension MainViewController {
 	
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		guard let cell = tableView.dequeueReusableCell(withIdentifier: CharacterCell.identifier, for: indexPath) as? CharacterCell else { return UITableViewCell() }
-		let character = self.presenter.characters[indexPath.row]
-		cell.character = character
 		
+		if !self.presenter.searchedCharacters.isEmpty {
+			let character = self.presenter.searchedCharacters[indexPath.row]
+			cell.character = character
+			self.cacheImage(for: cell, character: character)
+		} else {
+			let character = self.presenter.characters[indexPath.row]
+			cell.character = character
+			self.cacheImage(for: cell, character: character)
+		}
+		return cell
+	}
+	
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		let controller = DetailViewController()
+		var character = self.presenter.characters[indexPath.row]
+		if !self.presenter.searchedCharacters.isEmpty {
+			character = self.presenter.searchedCharacters[indexPath.row]
+		}
+		controller.configure(with: character)
+		self.present(controller, animated: true)
+		controller.modalPresentationStyle = .overCurrentContext
+		
+		_ = self.presenter.getImage(
+			from: character.image,
+			onSuccess: { data in
+				let img = UIImage.from(data: data)
+				controller.setImage(img)
+			}, onError: { error in
+				controller.setImage(UIImage(systemName: "picture"))
+			}
+		)
+	}
+}
+
+extension MainViewController {
+	
+	private func cacheImage(for cell: CharacterCell, character: Character) {
 		if let data = self.presenter.getCachedImage(url: character.image) {
 			cell.setImage(UIImage.from(data: data))
 		} else {
@@ -142,28 +197,7 @@ extension MainViewController {
 				}
 			}
 		}
-		return cell
-	}
-	
-	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		let controller = DetailViewController()
-		let character = self.presenter.characters[indexPath.row]
-		
-		self.present(controller, animated: true)
-		controller.modalPresentationStyle = .overCurrentContext
-		controller.configure(with: character)
-		
-		_ = self.presenter.getImage(
-			from: character.image,
-			onSuccess: { data in
-				
-				let img = UIImage.from(data: data)
-				
-				controller.setImage(img)
-			}, onError: { error in
-				controller.setImage(UIImage(systemName: "picture"))
-			}
-		)
+
 	}
 }
 
@@ -171,9 +205,7 @@ extension MainViewController {
 extension MainViewController {
 	private func createSpinnerFooter() -> UIView {
 		let footerView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: 50))
-		
 		footerView.backgroundColor = .clear
-		
 		let spinner = UIActivityIndicatorView()
 		spinner.center = footerView.center
 		
@@ -190,21 +222,45 @@ extension MainViewController {
 		
 		if position > (tableViewHeight - scrollHeight) {
 			let downloadedCount = self.presenter.characters.count
-			
 			guard self.presenter.canDownload(), downloadedCount != 0 else {
 				return
 			}
-			
 			DispatchQueue.main.async {
 				self.tableView.tableFooterView = self.createSpinnerFooter()
 			}
-			
 			// Here I add 1 page because of the initial data that is gathered on viewDidLoad
 			let page = Int(downloadedCount/20) + 1
-			
 			self.startRequest(with: page)
 		}
 	}
 }
 
+extension MainViewController: UISearchResultsUpdating {
+	func updateSearchResults(for searchController: UISearchController) {
+		
+		guard let searchText = searchController.searchBar.text else { return }
+		
+		if !searchText.isEmpty {
+			// get searched characters
+			timer?.invalidate()
+			timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { [weak self] _ in
+				DispatchQueue.global(qos: .background).async {
+					self?.presenter.searchCharacters(character: searchText, page: 0)
+				}
+			})
+//		} if  {
+		} else {
+			self.presenter.cleanSearchedCharacters()
+		}
+		print("searchbar input: \(searchController.searchBar.text)")
+			self.tableView.reloadData()
+	}
+}
+
+extension MainViewController: UISearchBarDelegate {
+	
+	func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+		self.tableView?.scrollToRow(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+	}
+}
 

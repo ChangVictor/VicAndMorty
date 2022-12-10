@@ -13,6 +13,7 @@ enum Constants {
 		static let characterPath = "/api/character"
 		static let resultsPerPage = 20
 		static let pageQueryParam = "page"
+		static let nameQueryParam = "name"
 	}
 }
 
