@@ -67,7 +67,6 @@ class MainPresenter: MainPresenterProtocol {
 	
 	func searchCharacters(character: String, page: Int) {
 		guard page <= searchPages else {
-			print("page \(page) - searchPage: \(searchPages)")
 			self.delegate?.onMaxPagesLoaded()
 			return
 		}

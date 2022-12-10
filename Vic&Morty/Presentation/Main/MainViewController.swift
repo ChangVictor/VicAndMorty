@@ -18,7 +18,6 @@ class MainViewController: UITableViewController {
 	private var presenter: MainPresenterProtocol
 	
 	let searchController = UISearchController(searchResultsController: nil)
-	private var searchResultViewController: SearchResultViewController!
 	private var timer: Timer?
 
 	init(_ presenter: MainPresenterProtocol = MainPresenter()) {
@@ -36,7 +35,7 @@ class MainViewController: UITableViewController {
 		
 		searchController.searchResultsUpdater = self
 		searchController.obscuresBackgroundDuringPresentation = false
-		searchController.searchBar.placeholder = "Search Characters..."
+		searchController.searchBar.placeholder = Constants.Strings.searchBarPlaceholder
 		navigationItem.searchController = searchController
 		definesPresentationContext = true
 		
@@ -44,7 +43,7 @@ class MainViewController: UITableViewController {
 		self.navigationController?.navigationBar.backgroundColor = .systemBackground
 		self.view.backgroundColor = .white
 		self.tableView.separatorStyle = .none
-		self.title = "Vic & Morty"
+		self.title = Constants.Strings.navigationTitle
 		
 		self.registerCell()
 		self.initialDownload()
@@ -74,17 +73,13 @@ extension MainViewController: MainViewProtocol {
 	}
 	
 	func onError(with page: Int) {
-		let alertController = UIAlertController.init(title: "There was an error with the API call", message: "Do you want to retry?", preferredStyle: .alert)
-		
-		let action = UIAlertAction.init(title: "Yes", style: .default, handler: { _ in
+		let alertController = UIAlertController.init(title: Constants.Alerts.requestErrorTitle, message: Constants.Alerts.requestErrorMessage, preferredStyle: .alert)
+		let action = UIAlertAction.init(title: Constants.Alerts.yesActionTitle, style: .default, handler: { _ in
 			self.startRequest(with: page)
 		})
-		
-		let actionCancel = UIAlertAction.init(title: "No", style: .cancel)
-		
+		let actionCancel = UIAlertAction.init(title: Constants.Alerts.noActionTitle, style: .cancel)
 		alertController.addAction(actionCancel)
 		alertController.addAction(action)
-		
 		DispatchQueue.main.async {
 			self.present(alertController, animated: true)
 			self.cleanSpinners()
@@ -93,8 +88,8 @@ extension MainViewController: MainViewProtocol {
 	
 	func onMaxPagesLoaded() {
 		self.cleanSpinners()
-		let alertController = UIAlertController.init(title: "There are no more results", message: nil, preferredStyle: .alert)
-		let actionCancel = UIAlertAction.init(title: "Ok", style: .cancel)
+		let alertController = UIAlertController.init(title: Constants.Alerts.maxPagesReached, message: nil, preferredStyle: .alert)
+		let actionCancel = UIAlertAction.init(title: Constants.Alerts.okActionTitle, style: .cancel)
 		alertController.addAction(actionCancel)
 		DispatchQueue.main.async {
 			self.present(alertController, animated: true)
@@ -210,8 +205,9 @@ extension MainViewController {
 		spinner.center = footerView.center
 		
 		footerView.addSubview(spinner)
-		spinner.startAnimating()
-		
+		DispatchQueue.main.async {
+			spinner.startAnimating()
+		}
 		return footerView
 	}
 	
@@ -248,12 +244,12 @@ extension MainViewController: UISearchResultsUpdating {
 					self?.presenter.searchCharacters(character: searchText, page: 0)
 				}
 			})
-//		} if  {
 		} else {
 			self.presenter.cleanSearchedCharacters()
 		}
-		print("searchbar input: \(searchController.searchBar.text)")
+		DispatchQueue.main.async {
 			self.tableView.reloadData()
+		}
 	}
 }
 
